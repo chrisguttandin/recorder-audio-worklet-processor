@@ -1,7 +1,5 @@
 # recorder-audio-worklet-processor
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/chrisguttandin/recorder-audio-worklet-processor.svg)](https://greenkeeper.io/)
-
 **The AudioWorkletProcessor which is used by the recorder-audio-worklet package.**
 
 [![tests](https://img.shields.io/travis/chrisguttandin/recorder-audio-worklet-processor/master.svg?style=flat-square)](https://travis-ci.org/chrisguttandin/recorder-audio-worklet-processor)
