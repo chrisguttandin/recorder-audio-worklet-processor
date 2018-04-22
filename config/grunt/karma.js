@@ -4,7 +4,7 @@ module.exports = {
     },
     'test-expectation-safari': {
         configFile: 'config/karma/config-expectation-safari.js',
-        singleRun: !true
+        singleRun: true
     },
     'test-integration': {
         configFile: 'config/karma/config-integration.js',
