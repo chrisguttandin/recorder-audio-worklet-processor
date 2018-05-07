@@ -76,7 +76,7 @@ describe('RecorderAudioWorkletProcessor', () => {
             describe('with a stop message', () => {
 
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.reset();
+                    recorderProcessor.port.postMessage.resetHistory();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -102,7 +102,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                 describe('with another stop message', () => {
 
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.reset();
+                        recorderProcessor.port.postMessage.resetHistory();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -129,7 +129,7 @@ describe('RecorderAudioWorkletProcessor', () => {
             describe('with another record message', () => {
 
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.reset();
+                    recorderProcessor.port.postMessage.resetHistory();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -247,7 +247,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     }
                 });
 
-                encoderPort.postMessage.reset();
+                encoderPort.postMessage.resetHistory();
             });
 
             it('should return false', () => {
