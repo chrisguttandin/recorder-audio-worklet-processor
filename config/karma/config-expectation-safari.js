@@ -89,7 +89,7 @@ module.exports = (config) => {
                 SafariSauceLabs: {
                     base: 'SauceLabs',
                     browserName: 'safari',
-                    platform: 'OS X 10.12'
+                    platform: 'OS X 10.13'
                 }
             },
 
