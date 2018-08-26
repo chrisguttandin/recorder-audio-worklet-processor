@@ -8,15 +8,15 @@ interface Event { // tslint:disable-line:interface-name
 
     readonly AT_TARGET: number;
 
-    readonly BUBBLING_PHASE: number;
-
     readonly bubbles: boolean;
 
-    readonly CAPTURING_PHASE: number;
+    readonly BUBBLING_PHASE: number;
+
+    readonly cancelable: boolean;
 
     cancelBubble: boolean;
 
-    readonly cancelable: boolean;
+    readonly CAPTURING_PHASE: number;
 
     readonly currentTarget: EventTarget | null;
 
