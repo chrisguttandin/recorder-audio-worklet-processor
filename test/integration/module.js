@@ -20,7 +20,7 @@ describe('module', () => {
     beforeEach(async () => {
         offlineAudioContext = new OfflineAudioContext({ length: 128, sampleRate: 44100 });
 
-        await offlineAudioContext.audioWorklet.addModule('base/src/module.ts');
+        await offlineAudioContext.audioWorklet.addModule('base/src/module.js');
 
         ({ port1, port2 } = new MessageChannel());
 
