@@ -61,8 +61,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                         id: 34,
                         method: 'record',
                         params: {
-                            encoderPort,
-                            isSupportingTransferables: true
+                            encoderPort
                         }
                     }
                 });
@@ -135,8 +134,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                             id: 35,
                             method: 'record',
                             params: {
-                                encoderPort,
-                                isSupportingTransferables: true
+                                encoderPort
                             }
                         }
                     });
@@ -180,8 +178,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     data: {
                         method: 'record',
                         params: {
-                            encoderPort,
-                            isSupportingTransferables: true
+                            encoderPort
                         }
                     }
                 });
@@ -236,8 +233,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     data: {
                         method: 'record',
                         params: {
-                            encoderPort,
-                            isSupportingTransferables: true
+                            encoderPort
                         }
                     }
                 });

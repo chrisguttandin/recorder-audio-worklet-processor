@@ -5,7 +5,6 @@ describe('module', () => {
 
     let audioWorkletNode;
     let constantSourceNode;
-    let isSupportingTransferables;
     let offlineAudioContext;
     let port1;
     let port2;
@@ -29,8 +28,6 @@ describe('module', () => {
 
         constantSourceNode.connect(audioWorkletNode);
         constantSourceNode.start();
-
-        isSupportingTransferables = !(!/Chrome/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent)) && (Math.random() < 0.5);
     });
 
     describe('with a recording RecorderProcessor', () => {
@@ -65,7 +62,7 @@ describe('module', () => {
                 offlineAudioContext.startRendering();
             };
 
-            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2, isSupportingTransferables } }, [ port2 ]);
+            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [ port2 ]);
         });
 
     });
@@ -74,7 +71,7 @@ describe('module', () => {
 
         beforeEach((done) => {
             audioWorkletNode.port.onmessage = () => done();
-            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2, isSupportingTransferables } }, [ port2 ]);
+            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [ port2 ]);
         });
 
         it('should send an empty array to the given port', (done) => {

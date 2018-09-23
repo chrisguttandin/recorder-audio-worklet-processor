@@ -10,8 +10,6 @@ export interface IRecordMessageEvent extends MessageEvent {
 
             encoderPort: MessagePort;
 
-            isSupportingTransferables: boolean;
-
         };
 
     };

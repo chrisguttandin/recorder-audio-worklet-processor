@@ -6,22 +6,18 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
 
     private _encoderPort: null | MessagePort;
 
-    private _isSupportingTransferables: boolean;
-
     private _state: 'inactive' | 'recording' | 'stopped';
 
     constructor (options: AudioWorkletNodeOptions) {
         super(options);
 
         this._encoderPort = null;
-        this._isSupportingTransferables = false;
         this._state = 'inactive';
 
         this.port.onmessage = ({ data }: IRecordMessageEvent | IStopMessageEvent) => {
             if (data.method === 'record') {
                 if (this._state === 'inactive') {
                     this._encoderPort = data.params.encoderPort;
-                    this._isSupportingTransferables = data.params.isSupportingTransferables;
                     this._state = 'recording';
 
                     this.port.postMessage({ id: data.id, result: null });
@@ -74,7 +70,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
                 this._stop(this._encoderPort);
             }
 
-            this._encoderPort.postMessage(input, this._isSupportingTransferables ? input.map(({ buffer }) => buffer) : [ ]);
+            this._encoderPort.postMessage(input, input.map(({ buffer }) => buffer));
 
             return true;
         }
