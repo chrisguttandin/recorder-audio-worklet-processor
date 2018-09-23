@@ -87,8 +87,8 @@ module.exports = (config) => {
 
             browsers: [
                 'ChromeSauceLabs',
-                'FirefoxSauceLabs',
-                'SafariSauceLabs'
+                'FirefoxSauceLabs'
+                // @todo Run tests on 'SafariSauceLabs' again when Safari 12 is supported.
             ],
 
             captureTimeout: 120000,
