@@ -4,7 +4,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
     default: {
         entry: {
-            worklet: './build/es2015/module.js'
+            worklet: './build/es2018/module.js'
         },
         mode: 'production',
         module: {
