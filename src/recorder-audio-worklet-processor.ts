@@ -56,7 +56,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
         };
     }
 
-    public process ([ input ]: Float32Array[][]) {
+    public process ([ input ]: Float32Array[][]): boolean {
         if (this._state === 'inactive') {
             return true;
         }
@@ -78,7 +78,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
         return false;
     }
 
-    private _stop (encoderPort: MessagePort) {
+    private _stop (encoderPort: MessagePort): void {
         encoderPort.postMessage([ ]);
         encoderPort.close();
 
