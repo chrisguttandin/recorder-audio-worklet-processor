@@ -4,5 +4,5 @@
       "../src/audio-worklet-global-scope"
     ]
   },
-  "extends": "../node_modules/tsconfig-holy-grail/src/tsconfig-universal"
+  "extends": "tsconfig-holy-grail/src/tsconfig-universal"
 }
