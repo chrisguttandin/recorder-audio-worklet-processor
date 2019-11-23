@@ -8,8 +8,8 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
 
     private _state: 'inactive' | 'recording' | 'stopped';
 
-    constructor (options: AudioWorkletNodeOptions) {
-        super(options);
+    constructor () {
+        super();
 
         this._encoderPort = null;
         this._state = 'inactive';

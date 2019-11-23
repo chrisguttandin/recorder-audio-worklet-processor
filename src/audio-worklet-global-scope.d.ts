@@ -206,7 +206,7 @@ declare var AudioWorkletProcessor: {
 
     prototype: AudioWorkletProcessor;
 
-    new (options: AudioWorkletNodeOptions): AudioWorkletProcessor;
+    new (): AudioWorkletProcessor;
 
 };
 
