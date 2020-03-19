@@ -17,6 +17,9 @@ module.exports = (config) => {
                     })(self);`,
                     beforeScripts: `(function(self) {
                         self.AudioWorkletProcessor = class { };
+                        self.currentFrame = 0;
+                        self.currentTime = 0;
+                        self.sampleRate = 44100;
                     })(self);`
                 },
                 pattern: [

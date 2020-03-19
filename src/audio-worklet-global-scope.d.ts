@@ -210,4 +210,10 @@ declare var AudioWorkletProcessor: {
 
 };
 
+declare const currentFrame: number;
+
+declare const currentTime: number;
+
+declare const sampleRate: number;
+
 declare function registerProcessor <T extends AudioWorkletProcessorConstructor> (name: string, processorCtor: T): void;
