@@ -1,14 +1,13 @@
 import { IAudioWorkletProcessor, IRecordMessageEvent, IStopMessageEvent } from './interfaces';
 
 export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor implements IAudioWorkletProcessor {
-
-    public static parameterDescriptors = [ ];
+    public static parameterDescriptors = [];
 
     private _encoderPort: null | MessagePort;
 
     private _state: 'inactive' | 'recording' | 'stopped';
 
-    constructor () {
+    constructor() {
         super();
 
         this._encoderPort = null;
@@ -44,19 +43,19 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
                         id: data.id
                     });
                 }
-            } else if (typeof (<MessageEvent['data']> data).id === 'number') {
+            } else if (typeof (<MessageEvent['data']>data).id === 'number') {
                 this.port.postMessage({
                     error: {
                         code: -32601,
                         message: 'The requested method is not supported.'
                     },
-                    id: (<number> (<MessageEvent['data']> data).id)
+                    id: <number>(<MessageEvent['data']>data).id
                 });
             }
         };
     }
 
-    public process ([ input ]: Float32Array[][]): boolean {
+    public process([input]: Float32Array[][]): boolean {
         if (this._state === 'inactive') {
             return true;
         }
@@ -70,7 +69,10 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
                 this._stop(this._encoderPort);
             }
 
-            this._encoderPort.postMessage(input, input.map(({ buffer }) => buffer));
+            this._encoderPort.postMessage(
+                input,
+                input.map(({ buffer }) => buffer)
+            );
 
             return true;
         }
@@ -78,12 +80,11 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
         return false;
     }
 
-    private _stop (encoderPort: MessagePort): void {
-        encoderPort.postMessage([ ]);
+    private _stop(encoderPort: MessagePort): void {
+        encoderPort.postMessage([]);
         encoderPort.close();
 
         this._encoderPort = null;
         this._state = 'stopped';
     }
-
 }

@@ -2,7 +2,6 @@ import { RecorderAudioWorkletProcessor } from '../../src/recorder-audio-worklet-
 import { spy } from 'sinon';
 
 describe('RecorderAudioWorkletProcessor', () => {
-
     let recorderProcessor;
 
     afterEach(() => {
@@ -16,17 +15,13 @@ describe('RecorderAudioWorkletProcessor', () => {
     });
 
     describe('constructor()', () => {
-
         it('should register an onmessage listener', () => {
             expect(recorderProcessor.port.onmessage).not.to.be.null;
         });
-
     });
 
     describe('port', () => {
-
         describe('with a stop message', () => {
-
             beforeEach(() => {
                 recorderProcessor.port.onmessage({
                     data: {
@@ -46,11 +41,9 @@ describe('RecorderAudioWorkletProcessor', () => {
                     id: 34
                 });
             });
-
         });
 
         describe('with a record message', () => {
-
             let encoderPort;
 
             beforeEach(() => {
@@ -73,7 +66,6 @@ describe('RecorderAudioWorkletProcessor', () => {
             });
 
             describe('with a stop message', () => {
-
                 beforeEach(() => {
                     recorderProcessor.port.postMessage.resetHistory();
                     recorderProcessor.port.onmessage({
@@ -91,7 +83,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 it('should send an empty arrray', () => {
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([ ]);
+                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([]);
                 });
 
                 it('should close the encoderPort', () => {
@@ -99,7 +91,6 @@ describe('RecorderAudioWorkletProcessor', () => {
                 });
 
                 describe('with another stop message', () => {
-
                     beforeEach(() => {
                         recorderProcessor.port.postMessage.resetHistory();
                         recorderProcessor.port.onmessage({
@@ -120,13 +111,10 @@ describe('RecorderAudioWorkletProcessor', () => {
                             id: 36
                         });
                     });
-
                 });
-
             });
 
             describe('with another record message', () => {
-
                 beforeEach(() => {
                     recorderProcessor.port.postMessage.resetHistory();
                     recorderProcessor.port.onmessage({
@@ -150,25 +138,18 @@ describe('RecorderAudioWorkletProcessor', () => {
                         id: 35
                     });
                 });
-
             });
-
         });
-
     });
 
     describe('process()', () => {
-
         describe('without an encoderPort', () => {
-
             it('should return true', () => {
-                expect(recorderProcessor.process([ ])).to.be.true;
+                expect(recorderProcessor.process([])).to.be.true;
             });
-
         });
 
         describe('with an encoderPort', () => {
-
             let encoderPort;
 
             beforeEach(() => {
@@ -185,45 +166,39 @@ describe('RecorderAudioWorkletProcessor', () => {
             });
 
             describe('without channelData for the first input', () => {
-
                 it('should throw an error', () => {
                     expect(() => {
-                        recorderProcessor.process([ ]);
+                        recorderProcessor.process([]);
                     }).to.throw(Error, 'No channelData was received for the first input.');
                 });
-
             });
 
             describe('with some channelData for the first input', () => {
-
                 let channelData;
                 let transferables;
 
                 beforeEach(() => {
-                    channelData = [ new Float32Array(128), new Float32Array(128) ];
-                    transferables = [ channelData[0].buffer, channelData[1].buffer ];
+                    channelData = [new Float32Array(128), new Float32Array(128)];
+                    transferables = [channelData[0].buffer, channelData[1].buffer];
 
                     channelData[0].fill(1);
                     channelData[1].fill(-1);
                 });
 
                 it('should return true', () => {
-                    expect(recorderProcessor.process([ channelData ])).to.be.true;
+                    expect(recorderProcessor.process([channelData])).to.be.true;
                 });
 
                 it('should send the channelData', () => {
-                    recorderProcessor.process([ channelData ]);
+                    recorderProcessor.process([channelData]);
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
                     expect(encoderPort.postMessage).to.have.been.calledWithExactly(channelData, transferables);
                 });
-
             });
-
         });
 
         describe('with an removed encoderPort', () => {
-
             let encoderPort;
 
             beforeEach(() => {
@@ -247,17 +222,14 @@ describe('RecorderAudioWorkletProcessor', () => {
             });
 
             it('should return false', () => {
-                expect(recorderProcessor.process([ ])).to.be.false;
+                expect(recorderProcessor.process([])).to.be.false;
             });
 
             it('should not send anything', () => {
-                recorderProcessor.process([ ]);
+                recorderProcessor.process([]);
 
                 expect(encoderPort.postMessage).to.have.not.been.called;
             });
-
         });
-
     });
-
 });

@@ -2,7 +2,6 @@ import { AudioWorkletNode, ConstantSourceNode, OfflineAudioContext } from 'stand
 import { spy } from 'sinon';
 
 describe('module', () => {
-
     let audioWorkletNode;
     let constantSourceNode;
     let offlineAudioContext;
@@ -31,7 +30,6 @@ describe('module', () => {
     });
 
     describe('with a recording RecorderProcessor', () => {
-
         let channelData;
 
         beforeEach(() => {
@@ -62,16 +60,14 @@ describe('module', () => {
                 offlineAudioContext.startRendering();
             };
 
-            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [ port2 ]);
+            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [port2]);
         });
-
     });
 
     describe('with a stopped RecorderProcessor', () => {
-
         beforeEach((done) => {
             audioWorkletNode.port.onmessage = () => done();
-            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [ port2 ]);
+            audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [port2]);
         });
 
         it('should send an empty array to the given port', (done) => {
@@ -87,7 +83,7 @@ describe('module', () => {
 
                 setTimeout(() => {
                     expect(listener).to.have.been.calledOnce;
-                    expect(listener).to.have.been.calledWithExactly([ ]);
+                    expect(listener).to.have.been.calledWithExactly([]);
 
                     done();
                 }, 100);
@@ -118,7 +114,5 @@ describe('module', () => {
 
             audioWorkletNode.port.postMessage({ id: 18, method: 'stop' });
         });
-
     });
-
 });
