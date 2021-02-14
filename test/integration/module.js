@@ -33,7 +33,7 @@ describe('module', () => {
         let channelData;
 
         beforeEach(() => {
-            channelData = new Array(128);
+            channelData = new Float32Array(128);
 
             channelData.fill(1);
         });
@@ -42,11 +42,9 @@ describe('module', () => {
             port1.onmessage = ({ data }) => {
                 expect(data.length).to.equal(2);
 
-                expect(data[0].length).to.equal(128);
-                expect(Array.from(data[0])).to.deep.equal(channelData);
+                expect(data[0]).to.deep.equal(channelData);
 
-                expect(data[1].length).to.equal(128);
-                expect(Array.from(data[1])).to.deep.equal(channelData);
+                expect(data[1]).to.deep.equal(channelData);
 
                 done();
             };
