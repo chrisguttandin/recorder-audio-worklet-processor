@@ -81,7 +81,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 35, result: null });
                 });
 
-                it('should send an empty arrray', () => {
+                it('should send an empty array', () => {
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
                     expect(encoderPort.postMessage).to.have.been.calledWithExactly([]);
                 });
@@ -173,6 +173,24 @@ describe('RecorderAudioWorkletProcessor', () => {
                 });
             });
 
+            describe('with empty channelData for the first input', () => {
+                let channelData;
+
+                beforeEach(() => {
+                    channelData = [];
+                });
+
+                it('should return true', () => {
+                    expect(recorderProcessor.process([channelData])).to.be.true;
+                });
+
+                it('should not send anything', () => {
+                    recorderProcessor.process([channelData]);
+
+                    expect(encoderPort.postMessage).to.have.not.been.called;
+                });
+            });
+
             describe('with some channelData for the first input', () => {
                 let channelData;
                 let transferables;
@@ -194,6 +212,35 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
                     expect(encoderPort.postMessage).to.have.been.calledWithExactly(channelData, transferables);
+                });
+            });
+
+            describe('with empty channelData for the first input after being called with channelData', () => {
+                let channelData;
+
+                beforeEach(() => {
+                    channelData = [];
+
+                    recorderProcessor.process([[new Float32Array(128), new Float32Array(128)]]);
+
+                    encoderPort.postMessage.resetHistory();
+                });
+
+                it('should return false', () => {
+                    expect(recorderProcessor.process([channelData])).to.be.false;
+                });
+
+                it('should send an empty array', () => {
+                    recorderProcessor.process([channelData]);
+
+                    expect(encoderPort.postMessage).to.have.been.calledOnce;
+                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([]);
+                });
+
+                it('should close the encoderPort', () => {
+                    recorderProcessor.process([channelData]);
+
+                    expect(encoderPort.close).to.have.been.calledOnce;
                 });
             });
         });

@@ -1,11 +1,11 @@
 import { IAudioWorkletProcessor, IRecordMessageEvent, IStopMessageEvent } from './interfaces';
-
+declare const console: any;
 export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor implements IAudioWorkletProcessor {
     public static parameterDescriptors = [];
 
     private _encoderPort: null | MessagePort;
 
-    private _state: 'inactive' | 'recording' | 'stopped';
+    private _state: 'active' | 'inactive' | 'recording' | 'stopped';
 
     constructor() {
         super();
@@ -17,7 +17,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
             if (data.method === 'record') {
                 if (this._state === 'inactive') {
                     this._encoderPort = data.params.encoderPort;
-                    this._state = 'recording';
+                    this._state = 'active';
 
                     this.port.postMessage({ id: data.id, result: null });
                 } else {
@@ -30,7 +30,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
                     });
                 }
             } else if (data.method === 'stop') {
-                if (this._state === 'recording' && this._encoderPort !== null) {
+                if ((this._state === 'active' || this._state === 'recording') && this._encoderPort !== null) {
                     this._stop(this._encoderPort);
 
                     this.port.postMessage({ id: data.id, result: null });
@@ -60,6 +60,18 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
             return true;
         }
 
+        if (this._state === 'active') {
+            if (input === undefined) {
+                throw new Error('No channelData was received for the first input.');
+            }
+
+            if (input.length === 0) {
+                return true;
+            }
+
+            this._state = 'recording';
+        }
+
         if (this._state === 'recording' && this._encoderPort !== null) {
             if (input === undefined) {
                 throw new Error('No channelData was received for the first input.');
@@ -67,14 +79,14 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
 
             if (input.length === 0) {
                 this._stop(this._encoderPort);
+            } else {
+                this._encoderPort.postMessage(
+                    input,
+                    input.map(({ buffer }) => buffer)
+                );
+
+                return true;
             }
-
-            this._encoderPort.postMessage(
-                input,
-                input.map(({ buffer }) => buffer)
-            );
-
-            return true;
         }
 
         return false;
