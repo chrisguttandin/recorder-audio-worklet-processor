@@ -1,11 +1,11 @@
-import { IAudioWorkletProcessor, IRecordMessageEvent, IStopMessageEvent } from './interfaces';
-declare const console: any;
+import { IAudioWorkletProcessor, IPauseMessageEvent, IRecordMessageEvent, IResumeMessageEvent, IStopMessageEvent } from './interfaces';
+
 export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor implements IAudioWorkletProcessor {
     public static parameterDescriptors = [];
 
     private _encoderPort: null | MessagePort;
 
-    private _state: 'active' | 'inactive' | 'recording' | 'stopped';
+    private _state: 'active' | 'inactive' | 'paused' | 'recording' | 'stopped';
 
     constructor() {
         super();
@@ -13,35 +13,38 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
         this._encoderPort = null;
         this._state = 'inactive';
 
-        this.port.onmessage = ({ data }: IRecordMessageEvent | IStopMessageEvent) => {
-            if (data.method === 'record') {
+        this.port.onmessage = ({ data }: IPauseMessageEvent | IRecordMessageEvent | IResumeMessageEvent | IStopMessageEvent) => {
+            if (data.method === 'pause') {
+                if (this._state === 'active' || this._state === 'recording') {
+                    this._state = 'paused';
+
+                    this._sendAcknowledgement(data.id);
+                } else {
+                    this._sendUnexpectedStateError(data.id);
+                }
+            } else if (data.method === 'record') {
                 if (this._state === 'inactive') {
                     this._encoderPort = data.params.encoderPort;
                     this._state = 'active';
 
-                    this.port.postMessage({ id: data.id, result: null });
+                    this._sendAcknowledgement(data.id);
                 } else {
-                    this.port.postMessage({
-                        error: {
-                            code: -32603,
-                            message: 'The internal state does not allow to process the given message.'
-                        },
-                        id: data.id
-                    });
+                    this._sendUnexpectedStateError(data.id);
+                }
+            } else if (data.method === 'resume') {
+                if (this._state === 'paused') {
+                    this._state = 'active';
+
+                    this._sendAcknowledgement(data.id);
+                } else {
+                    this._sendUnexpectedStateError(data.id);
                 }
             } else if (data.method === 'stop') {
-                if ((this._state === 'active' || this._state === 'recording') && this._encoderPort !== null) {
+                if ((this._state === 'active' || this._state === 'paused' || this._state === 'recording') && this._encoderPort !== null) {
                     this._stop(this._encoderPort);
-
-                    this.port.postMessage({ id: data.id, result: null });
+                    this._sendAcknowledgement(data.id);
                 } else {
-                    this.port.postMessage({
-                        error: {
-                            code: -32603,
-                            message: 'The internal state does not allow to process the given message.'
-                        },
-                        id: data.id
-                    });
+                    this._sendUnexpectedStateError(data.id);
                 }
             } else if (typeof (<MessageEvent['data']>data).id === 'number') {
                 this.port.postMessage({
@@ -56,7 +59,7 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
     }
 
     public process([input]: Float32Array[][]): boolean {
-        if (this._state === 'inactive') {
+        if (this._state === 'inactive' || this._state === 'paused') {
             return true;
         }
 
@@ -90,6 +93,20 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
         }
 
         return false;
+    }
+
+    private _sendAcknowledgement(id: number): void {
+        this.port.postMessage({ id, result: null });
+    }
+
+    private _sendUnexpectedStateError(id: number): void {
+        this.port.postMessage({
+            error: {
+                code: -32603,
+                message: 'The internal state does not allow to process the given message.'
+            },
+            id
+        });
     }
 
     private _stop(encoderPort: MessagePort): void {
