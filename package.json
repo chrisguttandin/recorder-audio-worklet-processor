@@ -9,7 +9,7 @@
         }
     },
     "dependencies": {
-        "@babel/runtime": "^7.18.0",
+        "@babel/runtime": "^7.18.2",
         "tslib": "^2.4.0"
     },
     "description": "The AudioWorkletProcessor which is used by the recorder-audio-worklet package.",
