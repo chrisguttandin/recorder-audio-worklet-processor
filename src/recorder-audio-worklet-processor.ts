@@ -5,12 +5,15 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
 
     private _encoderPort: null | MessagePort;
 
+    private _numberOfChannels: number;
+
     private _state: 'active' | 'inactive' | 'paused' | 'recording' | 'stopped';
 
     constructor() {
         super();
 
         this._encoderPort = null;
+        this._numberOfChannels = 0;
         this._state = 'inactive';
 
         this.port.onmessage = ({ data }: IPauseMessageEvent | IRecordMessageEvent | IResumeMessageEvent | IStopMessageEvent) => {
@@ -81,15 +84,17 @@ export class RecorderAudioWorkletProcessor extends AudioWorkletProcessor impleme
             }
 
             if (input.length === 0) {
-                this._stop(this._encoderPort);
+                this._encoderPort.postMessage(Array.from({ length: this._numberOfChannels }, () => 128));
             } else {
                 this._encoderPort.postMessage(
                     input,
                     input.map(({ buffer }) => buffer)
                 );
 
-                return true;
+                this._numberOfChannels = input.length;
             }
+
+            return true;
         }
 
         return false;
