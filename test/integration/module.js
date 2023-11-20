@@ -8,13 +8,6 @@ describe('module', () => {
     let port1;
     let port2;
 
-    after(function (done) {
-        this.timeout(5000);
-
-        // @todo This is an optimistic fix to prevent the famous 'Some of your tests did a full page reload!' error.
-        setTimeout(done, 1000);
-    });
-
     beforeEach(async () => {
         offlineAudioContext = new OfflineAudioContext({ length: 128, sampleRate: 44100 });
 
