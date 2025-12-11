@@ -1,4 +1,5 @@
 import { AudioWorkletNode, ConstantSourceNode, OfflineAudioContext } from 'standardized-audio-context';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { spy } from 'sinon';
 
 describe('module', () => {
@@ -11,7 +12,7 @@ describe('module', () => {
     beforeEach(async () => {
         offlineAudioContext = new OfflineAudioContext({ length: 128, sampleRate: 44100 });
 
-        await offlineAudioContext.audioWorklet.addModule('base/src/module.js');
+        await offlineAudioContext.audioWorklet.addModule('../../src/module.js');
 
         ({ port1, port2 } = new MessageChannel());
 
@@ -31,15 +32,15 @@ describe('module', () => {
             channelData.fill(1);
         });
 
-        it('should send the channelData of its input to the given port', (done) => {
+        it('should send the channelData of its input to the given port', () => {
+            const { promise, resolve } = Promise.withResolvers();
+
             port1.onmessage = ({ data }) => {
                 expect(data.length).to.equal(2);
-
                 expect(data[0]).to.deep.equal(channelData);
-
                 expect(data[1]).to.deep.equal(channelData);
 
-                done();
+                resolve();
             };
 
             audioWorkletNode.port.onmessage = ({ data }) => {
@@ -52,17 +53,24 @@ describe('module', () => {
             };
 
             audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [port2]);
+
+            return promise;
         });
     });
 
     describe('with a stopped RecorderProcessor', () => {
-        beforeEach((done) => {
-            audioWorkletNode.port.onmessage = () => done();
+        beforeEach(() => {
+            const { promise, resolve } = Promise.withResolvers();
+
+            audioWorkletNode.port.onmessage = () => resolve();
             audioWorkletNode.port.postMessage({ id: 17, method: 'record', params: { encoderPort: port2 } }, [port2]);
+
+            return promise;
         });
 
-        it('should send an empty array to the given port', (done) => {
+        it('should send an empty array to the given port', () => {
             const listener = spy();
+            const { promise, resolve } = Promise.withResolvers();
 
             port1.onmessage = ({ data }) => listener(data);
 
@@ -76,15 +84,18 @@ describe('module', () => {
                     expect(listener).to.have.been.calledOnce;
                     expect(listener).to.have.been.calledWithExactly([]);
 
-                    done();
+                    resolve();
                 }, 100);
             };
 
             audioWorkletNode.port.postMessage({ id: 18, method: 'stop' });
+
+            return promise;
         });
 
-        it('should not send channelData to the given port', (done) => {
+        it('should not send channelData to the given port', () => {
             const listener = spy();
+            const { promise, resolve } = Promise.withResolvers();
 
             port1.onmessage = async () => {
                 port1.onmessage = listener;
@@ -93,7 +104,7 @@ describe('module', () => {
 
                 expect(listener).to.have.not.been.called;
 
-                done();
+                resolve();
             };
 
             audioWorkletNode.port.onmessage = ({ data }) => {
@@ -104,6 +115,8 @@ describe('module', () => {
             };
 
             audioWorkletNode.port.postMessage({ id: 18, method: 'stop' });
+
+            return promise;
         });
     });
 });

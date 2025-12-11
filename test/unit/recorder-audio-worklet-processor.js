@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RecorderAudioWorkletProcessor } from '../../src/recorder-audio-worklet-processor';
 import { spy } from 'sinon';
 
