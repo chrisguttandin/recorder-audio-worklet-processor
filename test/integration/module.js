@@ -1,6 +1,5 @@
 import { AudioWorkletNode, ConstantSourceNode, OfflineAudioContext } from 'standardized-audio-context';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { spy } from 'sinon';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('module', () => {
     let audioWorkletNode;
@@ -69,7 +68,7 @@ describe('module', () => {
         });
 
         it('should send an empty array to the given port', () => {
-            const listener = spy();
+            const listener = vi.fn();
             const { promise, resolve } = Promise.withResolvers();
 
             port1.onmessage = ({ data }) => listener(data);
@@ -82,7 +81,7 @@ describe('module', () => {
 
                 setTimeout(() => {
                     expect(listener).to.have.been.calledOnce;
-                    expect(listener).to.have.been.calledWithExactly([]);
+                    expect(listener).to.have.been.calledWith([]);
 
                     resolve();
                 }, 100);
@@ -94,7 +93,7 @@ describe('module', () => {
         });
 
         it('should not send channelData to the given port', () => {
-            const listener = spy();
+            const listener = vi.fn();
             const { promise, resolve } = Promise.withResolvers();
 
             port1.onmessage = async () => {

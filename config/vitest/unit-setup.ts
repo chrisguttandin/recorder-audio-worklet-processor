@@ -1,8 +1,3 @@
-import { use } from 'chai';
-import sinonChai from 'sinon-chai';
-
-use(sinonChai);
-
 (<typeof globalThis & { AudioWorkletProcessor: unknown }>globalThis).AudioWorkletProcessor = class {};
 (<typeof globalThis & { currentFrame: unknown }>globalThis).currentFrame = 0;
 (<typeof globalThis & { currentTime: unknown }>globalThis).currentTime = 0;

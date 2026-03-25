@@ -1,6 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RecorderAudioWorkletProcessor } from '../../src/recorder-audio-worklet-processor';
-import { spy } from 'sinon';
 
 describe('RecorderAudioWorkletProcessor', () => {
     let recorderProcessor;
@@ -10,7 +9,7 @@ describe('RecorderAudioWorkletProcessor', () => {
     });
 
     beforeEach(() => {
-        self.AudioWorkletProcessor.prototype.port = { onmessage: null, postMessage: spy() };
+        self.AudioWorkletProcessor.prototype.port = { onmessage: null, postMessage: vi.fn() };
 
         recorderProcessor = new RecorderAudioWorkletProcessor();
     });
@@ -34,7 +33,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             it('should send an error message', () => {
                 expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                     error: {
                         code: -32603,
                         message: 'The internal state does not allow to process the given message.'
@@ -48,7 +47,7 @@ describe('RecorderAudioWorkletProcessor', () => {
             let encoderPort;
 
             beforeEach(() => {
-                encoderPort = { close: spy(), onmessage: null, postMessage: spy() };
+                encoderPort = { close: vi.fn(), onmessage: null, postMessage: vi.fn() };
 
                 recorderProcessor.port.onmessage({
                     data: {
@@ -63,12 +62,12 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             it('should send a response message', () => {
                 expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 34, result: null });
+                expect(recorderProcessor.port.postMessage).to.have.been.calledWith({ id: 34, result: null });
             });
 
             describe('with a pause message', () => {
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.resetHistory();
+                    recorderProcessor.port.postMessage.mockClear();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -79,12 +78,12 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 it('should send a response message', () => {
                     expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                    expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 35, result: null });
+                    expect(recorderProcessor.port.postMessage).to.have.been.calledWith({ id: 35, result: null });
                 });
 
                 describe('with another pause message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -95,7 +94,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -107,7 +106,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with another record message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -121,7 +120,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -133,7 +132,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with a resume message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -144,13 +143,13 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send a response message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 36, result: null });
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({ id: 36, result: null });
                     });
                 });
 
                 describe('with a stop message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -161,12 +160,12 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send a response message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 36, result: null });
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({ id: 36, result: null });
                     });
 
                     it('should send an empty array', () => {
                         expect(encoderPort.postMessage).to.have.been.calledOnce;
-                        expect(encoderPort.postMessage).to.have.been.calledWithExactly([]);
+                        expect(encoderPort.postMessage).to.have.been.calledWith([]);
                     });
 
                     it('should close the encoderPort', () => {
@@ -175,7 +174,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     describe('with another pause message', () => {
                         beforeEach(() => {
-                            recorderProcessor.port.postMessage.resetHistory();
+                            recorderProcessor.port.postMessage.mockClear();
                             recorderProcessor.port.onmessage({
                                 data: {
                                     id: 37,
@@ -186,7 +185,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                         it('should send an error message', () => {
                             expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                            expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                            expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                                 error: {
                                     code: -32603,
                                     message: 'The internal state does not allow to process the given message.'
@@ -198,7 +197,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     describe('with another record message', () => {
                         beforeEach(() => {
-                            recorderProcessor.port.postMessage.resetHistory();
+                            recorderProcessor.port.postMessage.mockClear();
                             recorderProcessor.port.onmessage({
                                 data: {
                                     id: 37,
@@ -212,7 +211,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                         it('should send an error message', () => {
                             expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                            expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                            expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                                 error: {
                                     code: -32603,
                                     message: 'The internal state does not allow to process the given message.'
@@ -224,7 +223,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     describe('with a resume message', () => {
                         beforeEach(() => {
-                            recorderProcessor.port.postMessage.resetHistory();
+                            recorderProcessor.port.postMessage.mockClear();
                             recorderProcessor.port.onmessage({
                                 data: {
                                     id: 37,
@@ -235,7 +234,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                         it('should send an error message', () => {
                             expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                            expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                            expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                                 error: {
                                     code: -32603,
                                     message: 'The internal state does not allow to process the given message.'
@@ -247,7 +246,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     describe('with another stop message', () => {
                         beforeEach(() => {
-                            recorderProcessor.port.postMessage.resetHistory();
+                            recorderProcessor.port.postMessage.mockClear();
                             recorderProcessor.port.onmessage({
                                 data: {
                                     id: 37,
@@ -258,7 +257,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                         it('should send an error message', () => {
                             expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                            expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                            expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                                 error: {
                                     code: -32603,
                                     message: 'The internal state does not allow to process the given message.'
@@ -272,7 +271,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             describe('with another record message', () => {
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.resetHistory();
+                    recorderProcessor.port.postMessage.mockClear();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -286,7 +285,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 it('should send an error message', () => {
                     expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                    expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                    expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                         error: {
                             code: -32603,
                             message: 'The internal state does not allow to process the given message.'
@@ -298,7 +297,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             describe('with a resume message', () => {
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.resetHistory();
+                    recorderProcessor.port.postMessage.mockClear();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -309,7 +308,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 it('should send an error message', () => {
                     expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                    expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                    expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                         error: {
                             code: -32603,
                             message: 'The internal state does not allow to process the given message.'
@@ -321,7 +320,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             describe('with a stop message', () => {
                 beforeEach(() => {
-                    recorderProcessor.port.postMessage.resetHistory();
+                    recorderProcessor.port.postMessage.mockClear();
                     recorderProcessor.port.onmessage({
                         data: {
                             id: 35,
@@ -332,12 +331,12 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 it('should send a response message', () => {
                     expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                    expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({ id: 35, result: null });
+                    expect(recorderProcessor.port.postMessage).to.have.been.calledWith({ id: 35, result: null });
                 });
 
                 it('should send an empty array', () => {
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([]);
+                    expect(encoderPort.postMessage).to.have.been.calledWith([]);
                 });
 
                 it('should close the encoderPort', () => {
@@ -346,7 +345,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with a pause message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -357,7 +356,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -369,7 +368,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with another record message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -383,7 +382,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -395,7 +394,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with a resume message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -406,7 +405,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -418,7 +417,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                 describe('with another stop message', () => {
                     beforeEach(() => {
-                        recorderProcessor.port.postMessage.resetHistory();
+                        recorderProcessor.port.postMessage.mockClear();
                         recorderProcessor.port.onmessage({
                             data: {
                                 id: 36,
@@ -429,7 +428,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     it('should send an error message', () => {
                         expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                        expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                        expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                             error: {
                                 code: -32603,
                                 message: 'The internal state does not allow to process the given message.'
@@ -453,7 +452,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             it('should send an error message', () => {
                 expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                     error: {
                         code: -32603,
                         message: 'The internal state does not allow to process the given message.'
@@ -475,7 +474,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
             it('should send an error message', () => {
                 expect(recorderProcessor.port.postMessage).to.have.been.calledOnce;
-                expect(recorderProcessor.port.postMessage).to.have.been.calledWithExactly({
+                expect(recorderProcessor.port.postMessage).to.have.been.calledWith({
                     error: {
                         code: -32603,
                         message: 'The internal state does not allow to process the given message.'
@@ -490,7 +489,7 @@ describe('RecorderAudioWorkletProcessor', () => {
         let encoderPort;
 
         beforeEach(() => {
-            encoderPort = { close: spy(), onmessage: null, postMessage: spy() };
+            encoderPort = { close: vi.fn(), onmessage: null, postMessage: vi.fn() };
         });
 
         describe('without any message', () => {
@@ -639,7 +638,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     recorderProcessor.process([channelData]);
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly(channelData, transferables);
+                    expect(encoderPort.postMessage).to.have.been.calledWith(channelData, transferables);
                 });
 
                 it('should not close the encoderPort', () => {
@@ -657,7 +656,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     recorderProcessor.process([[new Float32Array(128), new Float32Array(128)]]);
 
-                    encoderPort.postMessage.resetHistory();
+                    encoderPort.postMessage.mockClear();
                 });
 
                 it('should return true', () => {
@@ -668,7 +667,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     recorderProcessor.process([channelData]);
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([128, 128]);
+                    expect(encoderPort.postMessage).to.have.been.calledWith([128, 128]);
                 });
 
                 it('should not close the encoderPort', () => {
@@ -695,7 +694,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     }
                 });
 
-                encoderPort.postMessage.resetHistory();
+                encoderPort.postMessage.mockClear();
             });
 
             describe('without channelData for the first input', () => {
@@ -812,7 +811,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     }
                 });
 
-                encoderPort.postMessage.resetHistory();
+                encoderPort.postMessage.mockClear();
             });
 
             describe('without channelData for the first input', () => {
@@ -867,7 +866,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     recorderProcessor.process([channelData]);
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly(channelData, transferables);
+                    expect(encoderPort.postMessage).to.have.been.calledWith(channelData, transferables);
                 });
 
                 it('should not close the encoderPort', () => {
@@ -885,7 +884,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     recorderProcessor.process([[new Float32Array(128), new Float32Array(128)]]);
 
-                    encoderPort.postMessage.resetHistory();
+                    encoderPort.postMessage.mockClear();
                 });
 
                 it('should return true', () => {
@@ -896,7 +895,7 @@ describe('RecorderAudioWorkletProcessor', () => {
                     recorderProcessor.process([channelData]);
 
                     expect(encoderPort.postMessage).to.have.been.calledOnce;
-                    expect(encoderPort.postMessage).to.have.been.calledWithExactly([128, 128]);
+                    expect(encoderPort.postMessage).to.have.been.calledWith([128, 128]);
                 });
 
                 it('should not close the encoderPort', () => {
@@ -933,8 +932,8 @@ describe('RecorderAudioWorkletProcessor', () => {
                     }
                 });
 
-                encoderPort.close.resetHistory();
-                encoderPort.postMessage.resetHistory();
+                encoderPort.close.mockClear();
+                encoderPort.postMessage.mockClear();
             });
 
             describe('without channelData for the first input', () => {
@@ -1011,7 +1010,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     recorderProcessor.process([[new Float32Array(128), new Float32Array(128)]]);
 
-                    encoderPort.postMessage.resetHistory();
+                    encoderPort.postMessage.mockClear();
                 });
 
                 it('should return false', () => {
@@ -1048,8 +1047,8 @@ describe('RecorderAudioWorkletProcessor', () => {
                     }
                 });
 
-                encoderPort.close.resetHistory();
-                encoderPort.postMessage.resetHistory();
+                encoderPort.close.mockClear();
+                encoderPort.postMessage.mockClear();
             });
 
             describe('without channelData for the first input', () => {
@@ -1126,7 +1125,7 @@ describe('RecorderAudioWorkletProcessor', () => {
 
                     recorderProcessor.process([[new Float32Array(128), new Float32Array(128)]]);
 
-                    encoderPort.postMessage.resetHistory();
+                    encoderPort.postMessage.mockClear();
                 });
 
                 it('should return false', () => {
